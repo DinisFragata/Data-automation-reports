@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# Mac / Windows
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Compiled files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Data / outputs
+assets/  # imagens, PDFs e gráficos gerados
+*.pdf
+*.png
+
+# Credentials (sensitive info)
+credentials.json
+service_account.json
+token.pickle
+
+# Excel / temporary files
+put_excel_files_here/*.xlsx
