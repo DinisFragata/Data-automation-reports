@@ -29,15 +29,14 @@ Thumbs.db
 *.so
 *.dylib
 
-# Data / outputs
-assets/  # imagens, PDFs e gráficos gerados
-*.pdf
-*.png
-
 # Credentials (sensitive info)
 credentials.json
 service_account.json
 token.pickle
 
-# Excel / temporary files
-put_excel_files_here/*.xlsx
+# Ignore generated files inside assets/ (keep folder)
+assets/*.pdf
+assets/*.png
+
+# Ignore Excel files in put_excel_files_here/ that are temporary (optional)
+# put_excel_files_here/*.xlsx
