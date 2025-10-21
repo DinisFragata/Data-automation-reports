@@ -13,7 +13,7 @@ The **Automated Sales Report System** is a Python-based tool for generating busi
 ---
 ## Requirements
 - Python 3.9+
-- Libraries: `pandas`, `gspread`, `google-auth`, `google-auth-oauthlib`, `matplotlib`, `seaborn`, `fpdf`, `google-api-python-client`, `schedule`
+- Libraries: `pandas`, `openpyxl`, `gspread`, `google-auth`, `google-auth-oauthlib`, `matplotlib`, `seaborn`, `fpdf`, `google-api-python-client`, `schedule`
 - Install dependencies:
  ```bash
  pip install -r requirements.txt
@@ -33,7 +33,8 @@ or
  ```bash
  python main.py
  ```
-3. Follow the menu prompts to configure the Excel file name (required) and optionally set the recipients, schedule, and PDF body. The report PDF will be generated in `assets/sales_report.pdf`.
+3. From the main menu, choose **Change data source** to configure the Excel file name (required) and optionally set the recipients, schedule, and PDF body. 
+4. Choose **Run scheduled job now** from the menu to generate the report. The PDF will be created and saved in `assets/sales_report.pdf`.
 ---
 ### 2. Google Sheets Version
 1. Create a Google Cloud Project and enable the **Google Sheets API**, **Gmail API**, and **Google Drive API**.
@@ -63,6 +64,23 @@ project/
 ■■ assets/ # Generated PDFs and charts
 ■■ venv/ # Virtual environment
 ```
+---
+### Who to get Google OAuth Credentials (credentials.json)
+To send emails via Gmail, the program requires a **credentials file** for OAuth 2.0. This file is **not generated automatically**; you need to create it in the *Google Cloud Console*:
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a **new project** or select an existing one.
+3. Enable the following APIs for your project:
+   - Gmail API;
+   - Google Sheets API (if using Google Sheets);
+   - Google Drive API (if using Google Sheets);
+4. In the left menu, navigate to **APIs & Services** > **Credentials**.
+5. Click **Create Credentials** → **OAuth Client ID**.
+- Select **Desktop app** as the application type.
+-  Give it a name and click Create.
+6. Download the generated JSON file and rename it to `credentials.json`.
+7. Place this file in the '*data-automation-reports*' folder.
+<br> <br> When you run the program and choose to send emails, it will open a browser window asking you to authorize access to the Gmail account that will send the emails. The token will be saved automatically for future use.
+<br> <br> **Important**: Never commit your `credentials.json` or `token.pickle` to GitHub, as these contain sensitive credentials
 ---
 ## Notes
 - **Do not commit credentials** to Git (`credentials.json`, `service_account.json`, `token.pickle`).
