@@ -13,7 +13,7 @@ The **Automated Sales Report System** is a Python-based tool for generating busi
 ---
 ## Requirements
 - Python 3.9+
-- Libraries: `pandas`, `gspread`, `google-auth`, `google-auth-oauthlib`, `matplotlib`, `seaborn`, `fpdf`, `google-api-python-client`
+- Libraries: `pandas`, `gspread`, `google-auth`, `google-auth-oauthlib`, `matplotlib`, `seaborn`, `fpdf`, `google-api-python-client`, `schedule`
 - Install dependencies:
  ```bash
  pip install -r requirements.txt
