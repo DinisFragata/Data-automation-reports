@@ -35,7 +35,7 @@ service_account.json
 token.pickle
 
 # Ignore generated files inside assets/ (keep folder)
-#assets/*.pdf
+assets/*.pdf
 assets/*.png
 
 # Ignore Excel files in put_excel_files_here/ that are temporary (optional)
