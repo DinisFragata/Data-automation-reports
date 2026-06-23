@@ -2,18 +2,30 @@ import os
 import uuid
 import pandas as pd
 
-from fastapi import FastAPI, UploadFile, File, Request
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from data_processing import clean_data
 from report import generate_charts
 from pdf_generator import generate_pdf
 
 
-app = FastAPI(title="Automated Sales Report System")
+app = FastAPI(title="Automated Sales Report API")
 
-templates = Jinja2Templates(directory="templates")
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://data-automation-reports.vercel.app",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 ASSETS_DIR = "assets"
@@ -22,9 +34,14 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(ASSETS_DIR, exist_ok=True)
 
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/")
+def root():
+    return {"message": "Automated Sales Report API is running"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.post("/generate-report")
@@ -40,13 +57,11 @@ async def generate_report(file: UploadFile = File(...)):
     pdf_path = os.path.join(ASSETS_DIR, f"sales_report_{file_id}.pdf")
 
     try:
-        # Save uploaded file
         file_content = await file.read()
 
         with open(upload_path, "wb") as f:
             f.write(file_content)
 
-        # Read Excel
         df = pd.read_excel(upload_path)
 
         required_columns = ["Date", "Product", "Quantity", "Price", "Seller"]
@@ -60,19 +75,17 @@ async def generate_report(file: UploadFile = File(...)):
                 }
             )
 
-        # Keep only the columns the report actually needs
         df = df[required_columns]
-
-        # Clean empty rows only after removing unnecessary columns
         df = clean_data(df)
 
         if df.empty:
             return JSONResponse(
                 status_code=400,
                 content={
-                    "error": "The uploaded file has no valid rows after cleaning. Please check if the required columns contain data."
+                    "error": "The uploaded file has no valid rows after cleaning."
                 }
             )
+
         generate_charts(df)
 
         generate_pdf(
@@ -95,3 +108,7 @@ async def generate_report(file: UploadFile = File(...)):
             status_code=500,
             content={"error": f"Something went wrong: {str(e)}"}
         )
+
+    finally:
+        if os.path.exists(upload_path):
+            os.remove(upload_path)

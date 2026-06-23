@@ -135,6 +135,8 @@
   </div>
 
   <script>
+    const API_URL = "https://data-automation-reports-production.up.railway.app";
+
     const form = document.getElementById("reportForm");
     const fileInput = document.getElementById("fileInput");
     const submitBtn = document.getElementById("submitBtn");
@@ -162,14 +164,21 @@
       downloadArea.innerHTML = "";
 
       try {
-        const response = await fetch("/generate-report", {
+        const response = await fetch(`${API_URL}/generate-report`, {
           method: "POST",
           body: formData
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to generate report.");
+          const contentType = response.headers.get("content-type") || "";
+
+          if (contentType.includes("application/json")) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to generate report.");
+          }
+
+          const errorText = await response.text();
+          throw new Error(errorText.slice(0, 200) || "Failed to generate report.");
         }
 
         const blob = await response.blob();
