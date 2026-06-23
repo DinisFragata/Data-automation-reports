@@ -8,3 +8,7 @@ seaborn
 fpdf
 schedule
 openpyxl
+fastapi
+uvicorn
+python-multipart
+jinja2
