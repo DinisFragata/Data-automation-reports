@@ -3,9 +3,6 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 def load_data_from_google_sheets(json_file, sheet_name):
-    """
-    Reads data from a Google Sheet and returns a pandas DataFrame
-    """
     creds = Credentials.from_service_account_file(
         json_file,
         scopes=["https://www.googleapis.com/auth/spreadsheets",
@@ -25,9 +22,6 @@ def load_data_from_google_sheets(json_file, sheet_name):
     return df
 
 def clean_data(df):
-    """
-    Basic data cleaning function
-    """
     df = df.dropna()  # remove lines with missing values
     # Convert columns to appropriate data types
     if 'Quantity' in df.columns:

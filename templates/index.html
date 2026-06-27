@@ -7,6 +7,10 @@
   <title>Automated Sales Report</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #f5f7fb;
@@ -16,12 +20,12 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 680px;
       margin: 80px auto;
       background: white;
       padding: 32px;
       border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
 
     h1 {
@@ -34,6 +38,40 @@
       line-height: 1.5;
     }
 
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      padding: 0;
+      border: none;
+      border-radius: 0;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+
     .upload-box {
       margin-top: 24px;
       padding: 24px;
@@ -42,9 +80,57 @@
       background: #f8fafc;
     }
 
-    input[type="file"] {
-      width: 100%;
+    .form-group {
       margin-bottom: 18px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      margin: 8px 0 18px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .email-fields {
+      display: none;
+      padding: 18px;
+      margin-bottom: 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .email-fields.visible {
+      display: block;
+    }
+
+    .more-options-btn {
+      width: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 12px;
+      margin-bottom: 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #374151;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .more-options-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .advanced-email-fields {
+      display: none;
+      padding-top: 4px;
+    }
+
+    .advanced-email-fields.visible {
+      display: block;
     }
 
     button {
@@ -71,6 +157,7 @@
       margin-top: 18px;
       font-size: 14px;
       color: #444;
+      line-height: 1.5;
     }
 
     .error {
@@ -98,6 +185,13 @@
       font-size: 13px;
       color: #777;
     }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: normal;
+    }
   </style>
 </head>
 
@@ -106,19 +200,74 @@
     <h1>Automated Sales Report</h1>
 
     <p>
-      Upload an Excel file and generate an automated PDF sales report with charts,
-      metrics and analysis.
+      Upload an Excel file and generate an automated PDF sales report with
+      charts, metrics and analysis. You can also send the report by email.
     </p>
 
     <div class="upload-box">
       <form id="reportForm">
-        <input
-          type="file"
-          id="fileInput"
-          name="file"
-          accept=".xlsx,.xls"
-          required
-        />
+        <div class="form-group">
+          <label for="fileInput">Excel file</label>
+          <input
+            type="file"
+            id="fileInput"
+            name="file"
+            accept=".xlsx,.xls"
+            required
+          />
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="sendEmailInput" />
+          <span>Send report by email</span>
+        </div>
+
+        <div id="emailFields" class="email-fields">
+          <div class="form-group">
+            <label for="recipientsInput">Recipients</label>
+            <input
+              type="text"
+              id="recipientsInput"
+              placeholder="client@example.com, admin@example.com"
+            />
+            <div class="hint">Separate multiple emails with commas.</div>
+          </div>
+
+          <button
+            type="button"
+            id="moreOptionsBtn"
+            class="more-options-btn"
+          >
+            More options
+          </button>
+
+          <div id="advancedEmailFields" class="advanced-email-fields">
+            <div class="form-group">
+              <label for="subjectInput">Email subject</label>
+              <input
+                type="text"
+                id="subjectInput"
+                value="Automated Sales Report"
+              />
+              <div class="hint">
+                Leave empty to use the default subject.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bodyInput">Email body</label>
+              <textarea id="bodyInput">Hello,
+
+Attached is your automated sales report with charts, metrics and analysis.
+
+Best regards,
+Automated Sales Report System</textarea>
+              <div class="hint">
+                Leave empty to use the default email body.
+              </div>
+            </div>
+          </div>
+        </div>
 
         <button type="submit" id="submitBtn">
           Generate PDF Report
@@ -137,16 +286,114 @@
   <script>
     const API_URL = "https://data-automation-reports-production.up.railway.app";
 
+    const DEFAULT_EMAIL_SUBJECT = "Automated Sales Report";
+
+    const DEFAULT_EMAIL_BODY = `Hello,
+
+Attached is your automated sales report with charts, metrics and analysis.
+
+Best regards,
+Automated Sales Report System`;
+
     const form = document.getElementById("reportForm");
     const fileInput = document.getElementById("fileInput");
+    const sendEmailInput = document.getElementById("sendEmailInput");
+    const emailFields = document.getElementById("emailFields");
+    const recipientsInput = document.getElementById("recipientsInput");
+    const subjectInput = document.getElementById("subjectInput");
+    const bodyInput = document.getElementById("bodyInput");
+
+    const moreOptionsBtn = document.getElementById("moreOptionsBtn");
+    const advancedEmailFields = document.getElementById("advancedEmailFields");
+
     const submitBtn = document.getElementById("submitBtn");
     const statusDiv = document.getElementById("status");
     const downloadArea = document.getElementById("downloadArea");
+
+    let moreOptionsOpen = false;
+
+    function updateEmailFieldsVisibility() {
+      if (sendEmailInput.checked) {
+        emailFields.classList.add("visible");
+        submitBtn.textContent = "Generate and Send Report";
+      } else {
+        emailFields.classList.remove("visible");
+        advancedEmailFields.classList.remove("visible");
+
+        moreOptionsOpen = false;
+        moreOptionsBtn.textContent = "More options";
+
+        submitBtn.textContent = "Generate PDF Report";
+      }
+    }
+
+    function toggleMoreOptions() {
+      moreOptionsOpen = !moreOptionsOpen;
+
+      if (moreOptionsOpen) {
+        advancedEmailFields.classList.add("visible");
+        moreOptionsBtn.textContent = "Hide options";
+      } else {
+        advancedEmailFields.classList.remove("visible");
+        moreOptionsBtn.textContent = "More options";
+      }
+    }
+
+    function getEmailSubject() {
+      const customSubject = subjectInput.value.trim();
+
+      if (!customSubject) {
+        return DEFAULT_EMAIL_SUBJECT;
+      }
+
+      return customSubject;
+    }
+
+    function getEmailBody() {
+      const customBody = bodyInput.value.trim();
+
+      if (!customBody) {
+        return DEFAULT_EMAIL_BODY;
+      }
+
+      return customBody;
+    }
+
+    function showDownloadLink(downloadUrl) {
+      if (!downloadUrl) return;
+
+      const link = document.createElement("a");
+      link.href = `${API_URL}${downloadUrl}`;
+      link.download = "sales_report.pdf";
+      link.textContent = "Download PDF Report";
+      link.className = "download-link";
+
+      downloadArea.innerHTML = "";
+      downloadArea.appendChild(link);
+    }
+
+    async function parseResponse(response) {
+      const contentType = response.headers.get("content-type") || "";
+
+      if (contentType.includes("application/json")) {
+        return await response.json();
+      }
+
+      const text = await response.text();
+
+      return {
+        error: text.slice(0, 300) || "Unexpected server response."
+      };
+    }
+
+    sendEmailInput.addEventListener("change", updateEmailFieldsVisibility);
+    moreOptionsBtn.addEventListener("click", toggleMoreOptions);
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const file = fileInput.files[0];
+      const shouldSendEmail = sendEmailInput.checked;
 
       if (!file) {
         statusDiv.textContent = "Please select an Excel file.";
@@ -154,12 +401,35 @@
         return;
       }
 
+      if (shouldSendEmail && !recipientsInput.value.trim()) {
+        statusDiv.textContent = "Please add at least one recipient email.";
+        statusDiv.className = "status error";
+        return;
+      }
+
       const formData = new FormData();
+
       formData.append("file", file);
+      formData.append("send_email", shouldSendEmail ? "true" : "false");
+      formData.append("recipients", recipientsInput.value.trim());
+
+      if (shouldSendEmail) {
+        formData.append("email_subject", getEmailSubject());
+        formData.append("email_body", getEmailBody());
+      } else {
+        formData.append("email_subject", DEFAULT_EMAIL_SUBJECT);
+        formData.append("email_body", DEFAULT_EMAIL_BODY);
+      }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = "Generating...";
-      statusDiv.textContent = "Generating report, please wait...";
+      submitBtn.textContent = shouldSendEmail
+        ? "Generating and sending..."
+        : "Generating...";
+
+      statusDiv.textContent = shouldSendEmail
+        ? "Generating report and sending email, please wait..."
+        : "Generating report, please wait...";
+
       statusDiv.className = "status";
       downloadArea.innerHTML = "";
 
@@ -169,40 +439,30 @@
           body: formData
         });
 
-        if (!response.ok) {
-          const contentType = response.headers.get("content-type") || "";
+        const data = await parseResponse(response);
 
-          if (contentType.includes("application/json")) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Failed to generate report.");
+        if (!response.ok) {
+          if (data.download_url) {
+            showDownloadLink(data.download_url);
           }
 
-          const errorText = await response.text();
-          throw new Error(errorText.slice(0, 200) || "Failed to generate report.");
+          throw new Error(data.error || "Failed to generate report.");
         }
 
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = downloadUrl;
-        link.download = "sales_report.pdf";
-        link.textContent = "Download PDF Report";
-        link.className = "download-link";
-
-        downloadArea.appendChild(link);
-
-        statusDiv.textContent = "Report generated successfully.";
+        statusDiv.textContent = data.message || "Report generated successfully.";
         statusDiv.className = "status success";
 
+        showDownloadLink(data.download_url);
       } catch (error) {
         statusDiv.textContent = error.message;
         statusDiv.className = "status error";
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Generate PDF Report";
+        updateEmailFieldsVisibility();
       }
     });
+
+    updateEmailFieldsVisibility();
   </script>
 </body>
 </html>

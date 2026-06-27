@@ -28,9 +28,6 @@ class PDF(FPDF):
 
 
 def generate_pdf(df, output_file='assets/sales_report.pdf', pdf_settings=None):
-    """
-    Generates a professional PDF with charts, metrics (in table), and analysis.
-    """
     pdf_settings = pdf_settings or {}
     title = pdf_settings.get("title", "Automatically generated sales report")
     header_text = pdf_settings.get("header_text", "")

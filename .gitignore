@@ -1,42 +1,36 @@
-# Python
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
-# Virtual environment
 venv/
 ENV/
 env/
 
-# Jupyter / IPython
-.ipynb_checkpoints/
+.env
+token.pickle
+credentials.json
+service_account.json
+service_account.generated.json
 
-# Mac / Windows
+uploads/
+uploads/*.xlsx
+assets/*.pdf
+assets/*.png
+
+.ipynb_checkpoints/
 .DS_Store
 Thumbs.db
 
-# IDEs
 .vscode/
 .idea/
 
-# Logs
 *.log
 
-# Compiled files
 *.exe
 *.dll
 *.so
 *.dylib
 
-# Credentials (sensitive info)
-credentials.json
-service_account.json
-token.pickle
-
-# Ignore generated files inside assets/ (keep folder)
-#assets/*.pdf
-assets/*.png
-
-# Ignore Excel files in put_excel_files_here/ that are temporary (optional)
-# put_excel_files_here/*.xlsx
+.history/
